@@ -1,0 +1,30 @@
+{
+ "MtBullerSki.exe": {
+  "dir": "mtbullerski",
+  "parts": 17,
+  "bytes": 140439750,
+  "size": 222039472,
+  "v": "3e68151c44"
+ },
+ "SCP-Foundation.exe": {
+  "dir": "scp-foundation",
+  "parts": 5,
+  "bytes": 39298456,
+  "size": 109596984,
+  "v": "c7ccbcc18f"
+ },
+ "Rally.exe": {
+  "dir": "rally",
+  "parts": 139,
+  "bytes": 1163634326,
+  "size": 1275780304,
+  "v": "5c9a92440d"
+ },
+ "iPhone-Duo-Tracker-2.2.0-portable.exe": {
+  "dir": "iphone-duo-tracker-2-2-0-portable",
+  "parts": 18,
+  "bytes": 145138940,
+  "size": 145474549,
+  "v": "a296dd9064"
+ }
+}

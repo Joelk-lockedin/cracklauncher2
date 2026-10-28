@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Download</title>
+<style>
+  :root { color-scheme: dark; --bg: oklch(0.145 0.004 260); --fg: oklch(0.96 0.004 260); --muted: oklch(0.64 0.008 260); --line: oklch(0.28 0.004 260); --primary: oklch(0.9 0.2 124); }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--muted); font: 14px/1.5 Manrope, system-ui, sans-serif; }
+  .box { box-sizing: border-box; min-height: 100%; padding: 24px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center; }
+  h1 { margin: 0; color: var(--fg); font-size: 22px; }
+  .bar { width: min(340px, 85vw); height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+  .bar i { display: block; width: 0; height: 100%; background: var(--primary); transition: width .2s; }
+  button { font: inherit; font-weight: 700; color: var(--bg); background: var(--primary); border: 0; border-radius: 6px; padding: 11px 22px; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  small { font-size: 12px; max-width: 420px; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1 id="name">Download</h1>
+  <p id="size"></p>
+  <button id="go">Download</button>
+  <div class="bar" hidden id="barWrap"><i id="fill"></i></div>
+  <small id="msg">Windows may warn about files from the internet: choose "More info" → "Run anyway" if you trust it.</small>
+</div>
+<script>
+// Joins a file split by scripts/pack-downloads.mjs (gzip parts under 8 MB, so a
+// static host can serve it) and saves it. Chrome/Edge stream straight to disk;
+// other browsers build it in memory first, then save.
+(() => {
+  const q = new URLSearchParams(location.search);
+  const dir = q.get('d') || '', parts = Number(q.get('n')), size = Number(q.get('s')) || 0, name = q.get('f') || 'download', v = q.get('v') || '';
+  const $ = id => document.getElementById(id);
+  const mb = n => n >= 1e9 ? `${(n / 1e9).toFixed(2)} GB` : `${(n / 1e6).toFixed(0)} MB`;
+  document.title = `Download ${name}`;
+  $('name').textContent = name;
+  $('size').textContent = size ? mb(size) : '';
+  if (!/^[a-z0-9-]+$/.test(dir) || !(parts >= 1 && parts <= 1000)) { $('go').disabled = true; $('msg').textContent = 'Unknown download.'; return; }
+
+  let done = 0;
+  const show = () => { $('fill').style.width = `${Math.min(100, done / size * 100)}%`; $('size').textContent = `${mb(done)} / ${mb(size)}`; };
+  // Parts arrive in order as one gzip stream; fetch a few ahead to keep the line busy.
+  const partStream = () => {
+    let next = 0;
+    const inflight = [];
+    const get = i => fetch(`/downloads/${dir}/${i}.bin?v=${v}`).then(r => { if (!r.ok) throw new Error(`Part ${i} failed (HTTP ${r.status})`); return r.arrayBuffer(); });
+    return new ReadableStream({
+      async pull(ctrl) {
+        while (inflight.length < 4 && next < parts) inflight.push(get(next++));
+        if (!inflight.length) return ctrl.close();
+        ctrl.enqueue(new Uint8Array(await inflight.shift()));
+      },
+    });
+  };
+  const counted = () => partStream().pipeThrough(new DecompressionStream('gzip')).pipeThrough(new TransformStream({
+    transform(chunk, ctrl) { done += chunk.length; show(); ctrl.enqueue(chunk); },
+  }));
+
+  $('go').onclick = async () => {
+    $('go').disabled = true;
+    $('barWrap').hidden = false;
+    $('msg').textContent = 'Downloading… keep this tab open.';
+    try {
+      if (window.showSaveFilePicker) {
+        const handle = await window.showSaveFilePicker({ suggestedName: name });
+        await counted().pipeTo(await handle.createWritable());
+      } else {
+        const blob = await new Response(counted()).blob();
+        const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: name });
+        a.click();
+      }
+      $('msg').textContent = 'Done! Check where you saved it.';
+    } catch (err) {
+      $('go').disabled = false;
+      $('msg').textContent = err && err.name === 'AbortError' ? 'Cancelled.' : `Download failed: ${err.message || err}. Try again.`;
+    }
+  };
+})();
+</script>
+</body>
+</html>

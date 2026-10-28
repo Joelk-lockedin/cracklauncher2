@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>High seas</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    overflow: hidden; background: #07031a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  canvas { display: block; position: fixed; inset: 0; }
+  #vignette {
+    position: fixed; inset: 0; pointer-events: none; z-index: 2;
+    background: radial-gradient(circle at 50% 42%, rgba(0,0,0,0) 38%, rgba(0,0,0,0.55) 100%);
+  }
+  #flash {
+    position: fixed; inset: 0; background: #ffffff; opacity: 0;
+    pointer-events: none; mix-blend-mode: screen; z-index: 3;
+  }
+  #titleCard {
+    position: fixed; top: 9%; left: 50%;
+    transform: translate(-50%, -14px) scale(0.85);
+    text-align: center; z-index: 4; opacity: 0; pointer-events: none;
+    transition: opacity .4s ease;
+  }
+  #titleCard.show { animation: tcPop 0.55s cubic-bezier(0.2, 1.4, 0.4, 1) forwards; }
+  @keyframes tcPop {
+    0%   { opacity: 0; transform: translate(-50%, -14px) scale(0.8); }
+    60%  { opacity: 1; transform: translate(-50%, 2px) scale(1.05); }
+    100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  }
+  .tc-line1 {
+    font-size: clamp(28px, 6vw, 64px); font-weight: 800; letter-spacing: .08em;
+    color: #f4eeff; text-shadow: 0 0 24px rgba(138,92,246,0.9), 0 4px 18px rgba(0,0,0,0.6);
+  }
+  .tc-bar {
+    width: 0; height: 3px; margin: 10px auto 8px;
+    background: linear-gradient(90deg, transparent, #b79bff, transparent);
+  }
+  #titleCard.show .tc-bar { animation: tcBar 0.6s ease 0.15s forwards; }
+  @keyframes tcBar { to { width: 220px; } }
+  .tc-line2 {
+    margin-top: 2px; font-size: clamp(12px, 2vw, 18px); letter-spacing: .35em;
+    color: #c9b8ff; text-transform: uppercase; opacity: 0;
+  }
+  #titleCard.show .tc-line2 { animation: tcFadeUp 0.5s ease 0.3s forwards; }
+  @keyframes tcFadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  #shockwave {
+    position: fixed; top: 50%; left: 50%; width: 20px; height: 20px;
+    margin: -10px 0 0 -10px; border-radius: 50%;
+    border: 2px solid rgba(180,150,255,0.8);
+    opacity: 0; pointer-events: none; z-index: 4;
+  }
+  #shockwave.go { animation: shockOut 0.9s ease-out forwards; }
+  @keyframes shockOut { 0% { opacity: 0.9; transform: scale(0); } 100% { opacity: 0; transform: scale(46); } }
+
+  #ui {
+    position: fixed; right: 18px; bottom: 18px; display: flex; gap: 10px;
+    z-index: 5; transition: opacity .3s ease;
+  }
+  #ui.hidden { opacity: 0; pointer-events: none; }
+  button {
+    background: rgba(10, 6, 26, 0.55); border: 1px solid rgba(255,255,255,0.18);
+    color: #f2effa; padding: 10px 18px; border-radius: 999px; font-size: 13px;
+    letter-spacing: .02em; cursor: pointer; backdrop-filter: blur(6px);
+  }
+  button:hover { background: rgba(255,255,255,0.12); }
+  button:active { transform: scale(0.97); }
+  #hideBtn { position: fixed; left: 18px; bottom: 18px; z-index: 6; }
+
+  #wavePanel {
+    position: fixed; top: 18px; right: 18px; z-index: 5;
+    background: rgba(10,6,26,0.55); border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 14px; padding: 10px 14px; backdrop-filter: blur(6px);
+    color: #f2effa; font-size: 12px; letter-spacing: .03em;
+    transition: opacity .3s ease;
+  }
+  #wavePanel.hidden { opacity: 0; pointer-events: none; }
+  #wavePanel input[type=range] { display: block; width: 150px; margin-top: 6px; }
+
+  #driveHint {
+    position: fixed; top: 18px; left: 18px; z-index: 5;
+    background: rgba(10,6,26,0.55); border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 14px; padding: 10px 14px; backdrop-filter: blur(6px);
+    color: #f2effa; font-size: 12px; letter-spacing: .02em;
+    transition: opacity .5s ease;
+  }
+  #driveHint.hidden { opacity: 0; pointer-events: none; }
+
+  #errBox {
+    position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
+    color: #f2effa; font-size: 15px; text-align: center; padding: 24px; z-index: 10;
+  }
+</style>
+</head>
+<body>
+<canvas id="scene" tabindex="0"></canvas>
+<div id="vignette"></div>
+<div id="flash"></div>
+<div id="titleCard">
+  <div class="tc-line1">WHARFIE TIME</div>
+  <div class="tc-bar"></div>
+  <div class="tc-line2">Dockers · 2026</div>
+</div>
+<div id="shockwave"></div>
+<div id="driveHint">Click here, then drive with <b>WASD</b> or <b>arrow keys</b></div>
+<div id="wavePanel">
+  Wave height
+  <input type="range" id="waveSlider" min="0.4" max="2.2" step="0.05" value="1.1">
+</div>
+<button id="hideBtn">Hide controls</button>
+<div id="ui">
+  <button id="activateBtn">Activate</button>
+  <button id="angleBtn">Angle</button>
+  <button id="fsBtn">Fullscreen</button>
+</div>
+<div id="errBox">WebGL isn't available in this browser/context.</div>
+
+<script>
+(function () {
+  const canvas = document.getElementById('scene');
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) { document.getElementById('errBox').style.display = 'flex'; return; }
+
+  // ---------------------------------------------------------------
+  // Minimal column-major mat4 helpers (hand-written, no library)
+  // ---------------------------------------------------------------
+  function m4Identity() { const m = new Float32Array(16); m[0] = m[5] = m[10] = m[15] = 1; return m; }
+  function m4Multiply(a, b) {
+    const o = new Float32Array(16);
+    for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) {
+      let s = 0; for (let k = 0; k < 4; k++) s += a[k * 4 + r] * b[c * 4 + k];
+      o[c * 4 + r] = s;
+    }
+    return o;
+  }
+  function m4Perspective(fovy, aspect, near, far) {
+    const f = 1 / Math.tan(fovy / 2), nf = 1 / (near - far);
+    const o = new Float32Array(16);
+    o[0] = f / aspect; o[5] = f; o[10] = (far + near) * nf; o[11] = -1; o[14] = 2 * far * near * nf;
+    return o;
+  }
+  function m4LookAt(eye, center, up) {
+    let z0 = eye[0] - center[0], z1 = eye[1] - center[1], z2 = eye[2] - center[2];
+    let len = Math.hypot(z0, z1, z2) || 1; z0 /= len; z1 /= len; z2 /= len;
+    let x0 = up[1] * z2 - up[2] * z1, x1 = up[2] * z0 - up[0] * z2, x2 = up[0] * z1 - up[1] * z0;
+    len = Math.hypot(x0, x1, x2) || 1; x0 /= len; x1 /= len; x2 /= len;
+    const y0 = z1 * x2 - z2 * x1, y1 = z2 * x0 - z0 * x2, y2 = z0 * x1 - z1 * x0;
+    const o = new Float32Array(16);
+    o[0] = x0; o[1] = y0; o[2] = z0; o[3] = 0;
+    o[4] = x1; o[5] = y1; o[6] = z1; o[7] = 0;
+    o[8] = x2; o[9] = y2; o[10] = z2; o[11] = 0;
+    o[12] = -(x0 * eye[0] + x1 * eye[1] + x2 * eye[2]);
+    o[13] = -(y0 * eye[0] + y1 * eye[1] + y2 * eye[2]);
+    o[14] = -(z0 * eye[0] + z1 * eye[1] + z2 * eye[2]);
+    o[15] = 1;
+    return o;
+  }
+  function m4Translation(x, y, z) { const m = m4Identity(); m[12] = x; m[13] = y; m[14] = z; return m; }
+  function m4RotationX(a) { const c = Math.cos(a), s = Math.sin(a); const m = m4Identity(); m[5] = c; m[6] = s; m[9] = -s; m[10] = c; return m; }
+  function m4RotationY(a) { const c = Math.cos(a), s = Math.sin(a); const m = m4Identity(); m[0] = c; m[2] = -s; m[8] = s; m[10] = c; return m; }
+  function m4RotationZ(a) { const c = Math.cos(a), s = Math.sin(a); const m = m4Identity(); m[0] = c; m[1] = s; m[4] = -s; m[5] = c; return m; }
+  function m4Scaling(s) { const m = m4Identity(); m[0] = s; m[5] = s; m[10] = s; return m; }
+  function makeBoatModel(pos, heading, pitch, roll, scale) {
+    let m = m4Translation(pos[0], pos[1], pos[2]);
+    m = m4Multiply(m, m4RotationY(heading));
+    m = m4Multiply(m, m4RotationZ(pitch));
+    m = m4Multiply(m, m4RotationX(roll));
+    m = m4Multiply(m, m4Scaling(scale));
+    return m;
+  }
+
+  function compile(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s));
+    return s;
+  }
+  function program(vsSrc, fsSrc) {
+    const p = gl.createProgram();
+    gl.attachShader(p, compile(gl.VERTEX_SHADER, vsSrc));
+    gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fsSrc));
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) console.error(gl.getProgramInfoLog(p));
+    return p;
+  }
+
+  function makeBox(w, h, d) {
+    const x = w / 2, y = h / 2, z = d / 2;
+    const positions = new Float32Array([
+      -x,-y,z,  x,-y,z,  x,y,z,  -x,y,z,
+       x,-y,-z, -x,-y,-z, -x,y,-z, x,y,-z,
+       x,-y,z,  x,-y,-z, x,y,-z,  x,y,z,
+      -x,-y,-z, -x,-y,z, -x,y,z, -x,y,-z,
+      -x,y,z,   x,y,z,   x,y,-z, -x,y,-z,
+      -x,-y,-z, x,-y,-z, x,-y,z, -x,-y,z
+    ]);
+    const normals = new Float32Array([
+      0,0,1, 0,0,1, 0,0,1, 0,0,1,
+      0,0,-1,0,0,-1,0,0,-1,0,0,-1,
+      1,0,0, 1,0,0, 1,0,0, 1,0,0,
+      -1,0,0,-1,0,0,-1,0,0,-1,0,0,
+      0,1,0, 0,1,0, 0,1,0, 0,1,0,
+      0,-1,0,0,-1,0,0,-1,0,0,-1,0
+    ]);
+    const indices = [];
+    for (let f = 0; f < 6; f++) { const o = f * 4; indices.push(o, o+1, o+2, o, o+2, o+3); }
+    return { positions, normals, indices: new Uint16Array(indices) };
+  }
+  function extrudeProfile(points, depth) {
+    const n = points.length, half = depth / 2;
+    const positions = [], normals = [], indices = [];
+    for (const [x, y] of points) { positions.push(x, y, half); normals.push(0, 0, 1); }
+    for (const [x, y] of points) { positions.push(x, y, -half); normals.push(0, 0, -1); }
+    for (let i = 1; i < n - 1; i++) indices.push(0, i, i + 1);
+    for (let i = 1; i < n - 1; i++) indices.push(n, n + i + 1, n + i);
+    for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n;
+      const [x0, y0] = points[i], [x1, y1] = points[j];
+      const dx = x1 - x0, dy = y1 - y0;
+      let nx = dy, ny = -dx; const len = Math.hypot(nx, ny) || 1; nx /= len; ny /= len;
+      const base = positions.length / 3;
+      positions.push(x0, y0, half); normals.push(nx, ny, 0);
+      positions.push(x1, y1, half); normals.push(nx, ny, 0);
+      positions.push(x0, y0, -half); normals.push(nx, ny, 0);
+      positions.push(x1, y1, -half); normals.push(nx, ny, 0);
+      indices.push(base, base + 1, base + 2, base + 1, base + 3, base + 2);
+    }
+    return { positions: new Float32Array(positions), normals: new Float32Array(normals), indices: new Uint16Array(indices) };
+  }
+  function buildOceanGrid(size, segments) {
+    const positions = []; const indices = [];
+    const half = size / 2, step = size / segments, rowLen = segments + 1;
+    for (let iz = 0; iz <= segments; iz++) for (let ix = 0; ix <= segments; ix++) {
+      positions.push(-half + ix * step, 0, -half + iz * step);
+    }
+    for (let iz = 0; iz < segments; iz++) for (let ix = 0; ix < segments; ix++) {
+      const a = iz * rowLen + ix, b = a + 1, c = a + rowLen, d = c + 1;
+      indices.push(a, c, b, b, c, d);
+    }
+    return { positions: new Float32Array(positions), indices: new Uint16Array(indices) };
+  }
+  function uploadMesh(mesh, hasNormal) {
+    const posBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, mesh.positions, gl.STATIC_DRAW);
+    let normBuf = null;
+    if (hasNormal) {
+      normBuf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, normBuf);
+      gl.bufferData(gl.ARRAY_BUFFER, mesh.normals, gl.STATIC_DRAW);
+    }
+    const idxBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, idxBuf);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.indices, gl.STATIC_DRAW);
+    return { posBuf, normBuf, idxBuf, count: mesh.indices.length };
+  }
+
+  gl.enable(gl.DEPTH_TEST);
+  gl.disable(gl.CULL_FACE);
+
+  const NUM_WAVES = 18;
+  const WIND_ANGLE = 0.35;
+  const MAX_WL = 75, MIN_WL = 1.6;
+  const waves = [];
+  for (let i = 0; i < NUM_WAVES; i++) {
+    const t = i / (NUM_WAVES - 1);
+    const wavelength = MAX_WL * Math.pow(MIN_WL / MAX_WL, t);
+    const k = (2 * Math.PI) / wavelength;
+    const amplitude = 1.9 * Math.pow(wavelength / MAX_WL, 1.45);
+    const steepness = Math.min(amplitude * k, 0.42);
+    const spreadDeg = 5 + t * 42;
+    const angle = WIND_ANGLE + (Math.random() - 0.5) * 2 * (spreadDeg * Math.PI / 180);
+    const dir = [Math.cos(angle), Math.sin(angle)];
+    const speedMult = (0.85 + t * 1.6) * (0.85 + Math.random() * 0.3);
+    const c = Math.sqrt(9.8 / k) * speedMult;
+    waves.push({ dir, k, c, steepness });
+  }
+  function waveHeightAt(x, z, t, list, intensity) {
+    let h = 0;
+    for (const w of list) {
+      const f = w.k * (w.dir[0] * x + w.dir[1] * z - w.c * t);
+      h += (w.steepness * intensity / w.k) * Math.sin(f);
+    }
+    // Safety clamp: with many wave components, rare constructive interference
+    // can otherwise produce an extreme spike/trough that breaks the follow-camera.
+    const cap = 6.5 * intensity;
+    return Math.max(-cap, Math.min(cap, h));
+  }
+
+  const oceanVS = `
+    precision highp float;
+    attribute vec3 aPosition;
+    uniform mat4 uProjection, uView, uModel;
+    uniform highp float uTime;
+    uniform float uIntensity;
+    uniform vec2 uWorldOffset;
+    #define NUM_WAVES ${NUM_WAVES}
+    uniform vec2 uDir[NUM_WAVES];
+    uniform float uK[NUM_WAVES];
+    uniform float uC[NUM_WAVES];
+    uniform float uSteepness[NUM_WAVES];
+    varying vec3 vNormal;
+    varying float vHeight;
+    varying vec3 vWorldPos;
+    void main() {
+      vec3 tangent = vec3(1.0,0.0,0.0);
+      vec3 binormal = vec3(0.0,0.0,1.0);
+      vec3 displaced = aPosition;
+      vec2 wp = aPosition.xz + uWorldOffset;
+      for (int i = 0; i < NUM_WAVES; i++) {
+        vec2 d = uDir[i];
+        float k = uK[i];
+        float c = uC[i];
+        float steep = uSteepness[i] * uIntensity;
+        float f = k * (dot(d, wp) - c * uTime);
+        float a = steep / k;
+        float sinF = sin(f), cosF = cos(f);
+        tangent += vec3(-d.x*d.x*steep*sinF, d.x*steep*cosF, -d.x*d.y*steep*sinF);
+        binormal += vec3(-d.x*d.y*steep*sinF, d.y*steep*cosF, -d.y*d.y*steep*sinF);
+        displaced += vec3(d.x*a*cosF, a*sinF, d.y*a*cosF);
+      }
+      vNormal = normalize(cross(binormal, tangent));
+      vHeight = displaced.y;
+      vec4 worldPos = uModel * vec4(displaced, 1.0);
+      vWorldPos = worldPos.xyz;
+      gl_Position = uProjection * uView * worldPos;
+    }
+  `;
+  const oceanFS = `
+    precision mediump float;
+    varying vec3 vNormal;
+    varying float vHeight;
+    varying vec3 vWorldPos;
+    uniform vec3 uLightDir, uDeepColor, uShallowColor, uCameraPos;
+    uniform vec2 uWindDir;
+    uniform highp float uTime;
+    float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453123); }
+    float noise(vec2 p){
+      vec2 i=floor(p), f=fract(p);
+      float a=hash(i), b=hash(i+vec2(1.0,0.0)), c=hash(i+vec2(0.0,1.0)), d=hash(i+vec2(1.0,1.0));
+      vec2 u=f*f*(3.0-2.0*f);
+      return mix(a,b,u.x)+(c-a)*u.y*(1.0-u.x)+(d-b)*u.x*u.y;
+    }
+    float fbm(vec2 p){
+      float v = noise(p) * 0.65;
+      v += noise(p * 2.7) * 0.35;
+      return v;
+    }
+    void main() {
+      vec2 e = vec2(0.6, 0.0);
+      float n1 = fbm(vWorldPos.xz*1.3 + uTime*0.25);
+      float n2 = fbm((vWorldPos.xz+e.xy)*1.3 + uTime*0.25);
+      float n3 = fbm((vWorldPos.xz+e.yx)*1.3 + uTime*0.25);
+      vec3 bump = normalize(vec3((n1-n2)*2.5, 1.0, (n1-n3)*2.5));
+      vec3 N = normalize(mix(normalize(vNormal), bump, 0.22));
+      vec3 L = normalize(uLightDir);
+      vec3 V = normalize(uCameraPos - vWorldPos);
+      vec3 H = normalize(L+V);
+      float diff = max(dot(N,L), 0.0);
+      float spec = pow(max(dot(N,H), 0.0), 90.0);
+      float fresnel = pow(1.0 - max(dot(N,V), 0.0), 3.0);
+      vec3 base = mix(uDeepColor, uShallowColor, clamp(vHeight*0.5+0.5, 0.0, 1.0));
+      vec3 color = base*(0.4+0.6*diff) + vec3(1.0)*spec*0.9;
+      color = mix(color, vec3(0.75,0.8,1.0), fresnel*0.18);
+      vec2 wd = normalize(uWindDir);
+      vec2 cr = vec2(-wd.y, wd.x);
+      vec2 streak = vec2(dot(vWorldPos.xz, wd), dot(vWorldPos.xz, cr));
+      float patch = fbm(vec2(streak.x*0.15, streak.y*0.9) - uTime*0.12);
+      float patch2 = fbm(vec2(streak.x*0.4, streak.y*2.2) + uTime*0.08);
+      float foam = smoothstep(0.35, 0.9, vHeight + (patch-0.5)*0.6 + (patch2-0.5)*0.3);
+      color = mix(color, vec3(0.92,0.9,1.0), foam*0.85);
+      gl_FragColor = vec4(color, 1.0);
+    }
+  `;
+  const oceanProg = program(oceanVS, oceanFS);
+  const oceanMesh = uploadMesh(buildOceanGrid(340, 200), false);
+  const oceanLoc = {
+    aPosition: gl.getAttribLocation(oceanProg, 'aPosition'),
+    uProjection: gl.getUniformLocation(oceanProg, 'uProjection'),
+    uView: gl.getUniformLocation(oceanProg, 'uView'),
+    uModel: gl.getUniformLocation(oceanProg, 'uModel'),
+    uTime: gl.getUniformLocation(oceanProg, 'uTime'),
+    uIntensity: gl.getUniformLocation(oceanProg, 'uIntensity'),
+    uWorldOffset: gl.getUniformLocation(oceanProg, 'uWorldOffset'),
+    uDir: gl.getUniformLocation(oceanProg, 'uDir[0]'),
+    uK: gl.getUniformLocation(oceanProg, 'uK[0]'),
+    uC: gl.getUniformLocation(oceanProg, 'uC[0]'),
+    uSteepness: gl.getUniformLocation(oceanProg, 'uSteepness[0]'),
+    uLightDir: gl.getUniformLocation(oceanProg, 'uLightDir'),
+    uDeepColor: gl.getUniformLocation(oceanProg, 'uDeepColor'),
+    uShallowColor: gl.getUniformLocation(oceanProg, 'uShallowColor'),
+    uWindDir: gl.getUniformLocation(oceanProg, 'uWindDir'),
+    uCameraPos: gl.getUniformLocation(oceanProg, 'uCameraPos')
+  };
+  const dirFlat = new Float32Array(NUM_WAVES * 2);
+  const kFlat = new Float32Array(NUM_WAVES);
+  const cFlat = new Float32Array(NUM_WAVES);
+  const steepFlat = new Float32Array(NUM_WAVES);
+  waves.forEach((w, i) => { dirFlat[i*2]=w.dir[0]; dirFlat[i*2+1]=w.dir[1]; kFlat[i]=w.k; cFlat[i]=w.c; steepFlat[i]=w.steepness; });
+
+  const solidVS = `
+    attribute vec3 aPosition, aNormal;
+    uniform mat4 uProjection, uView, uModel;
+    varying vec3 vNormal;
+    void main() {
+      vNormal = normalize((uModel * vec4(aNormal, 0.0)).xyz);
+      gl_Position = uProjection * uView * uModel * vec4(aPosition, 1.0);
+    }
+  `;
+  const solidFS = `
+    precision mediump float;
+    varying vec3 vNormal;
+    uniform vec3 uLightDir, uColor, uEmissive;
+    void main() {
+      vec3 N = normalize(vNormal);
+      float diff = max(dot(N, normalize(uLightDir)), 0.0);
+      vec3 col = uColor * (0.35 + 0.65 * diff) + uEmissive;
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `;
+  const solidProg = program(solidVS, solidFS);
+  const solidLoc = {
+    aPosition: gl.getAttribLocation(solidProg, 'aPosition'),
+    aNormal: gl.getAttribLocation(solidProg, 'aNormal'),
+    uProjection: gl.getUniformLocation(solidProg, 'uProjection'),
+    uView: gl.getUniformLocation(solidProg, 'uView'),
+    uModel: gl.getUniformLocation(solidProg, 'uModel'),
+    uLightDir: gl.getUniformLocation(solidProg, 'uLightDir'),
+    uColor: gl.getUniformLocation(solidProg, 'uColor'),
+    uEmissive: gl.getUniformLocation(solidProg, 'uEmissive')
+  };
+
+  const boatParts = [
+    { mesh: uploadMesh(extrudeProfile([[-2.2,0.12],[-1.9,0.45],[-1.5,0.5],[1.4,0.5],[1.9,0.42],[2.0,0.15],[1.5,0.0],[-1.9,0.0]], 0.95), true), pos:[0,0,0], color:[0.07,0.03,0.16], emissive:[0,0,0] },
+    { mesh: uploadMesh(makeBox(0.9,0.55,0.75), true), pos:[-0.3,0.775,0], color:[0.10,0.06,0.24], emissive:[0,0,0] },
+    { mesh: uploadMesh(makeBox(1.05,0.06,0.9), true), pos:[-0.3,1.08,0], color:[0.95,0.93,1.0], emissive:[0,0,0] },
+    { mesh: uploadMesh(makeBox(0.05,1.3,0.05), true), pos:[0.35,1.15,0], color:[0.07,0.03,0.16], emissive:[0,0,0] },
+    { mesh: uploadMesh(makeBox(3.4,0.12,0.98), true), pos:[-0.1,0.22,0], color:[0.54,0.36,0.90], emissive:[0.05,0.02,0.1] },
+    { mesh: uploadMesh(makeBox(0.09,0.09,0.09), true), pos:[1.9,0.35,0.4], color:[0.2,0.05,0.05], emissive:[1.0,0.23,0.23] },
+    { mesh: uploadMesh(makeBox(0.09,0.09,0.09), true), pos:[1.9,0.35,-0.4], color:[0.05,0.2,0.1], emissive:[0.23,1.0,0.42] },
+    { mesh: uploadMesh(makeBox(0.18,0.18,0.02), true), pos:[-0.55,0.8,0.39], color:[0.2,0.15,0.05], emissive:[1.0,0.81,0.54] },
+    { mesh: uploadMesh(makeBox(0.18,0.18,0.02), true), pos:[-0.05,0.8,0.39], color:[0.2,0.15,0.05], emissive:[1.0,0.81,0.54] }
+  ];
+
+  const ptVS = `
+    attribute vec3 aPosition;
+    attribute float aAlpha;
+    uniform mat4 uProjection, uView;
+    varying float vAlpha;
+    void main() {
+      vAlpha = aAlpha;
+      gl_Position = uProjection * uView * vec4(aPosition, 1.0);
+      gl_PointSize = 7.0;
+    }
+  `;
+  const ptFS = `
+    precision mediump float;
+    varying float vAlpha;
+    void main() {
+      vec2 c = gl_PointCoord - vec2(0.5);
+      float d = length(c);
+      if (d > 0.5) discard;
+      gl_FragColor = vec4(1.0, 1.0, 1.0, vAlpha * (1.0 - d * 1.7));
+    }
+  `;
+  const ptProg = program(ptVS, ptFS);
+  const ptLoc = {
+    aPosition: gl.getAttribLocation(ptProg, 'aPosition'),
+    aAlpha: gl.getAttribLocation(ptProg, 'aAlpha'),
+    uProjection: gl.getUniformLocation(ptProg, 'uProjection'),
+    uView: gl.getUniformLocation(ptProg, 'uView')
+  };
+  const MAX_PARTICLES = 500;
+  const ptPosArr = new Float32Array(MAX_PARTICLES * 3);
+  const ptAlphaArr = new Float32Array(MAX_PARTICLES);
+  const ptVel = []; const ptLife = new Float32Array(MAX_PARTICLES);
+  for (let i = 0; i < MAX_PARTICLES; i++) { ptPosArr[i*3+1] = -100; ptVel.push([0,0,0]); }
+  const ptPosBuf = gl.createBuffer();
+  const ptAlphaBuf = gl.createBuffer();
+  let ptCursor = 0;
+  function spawnParticle(x, y, z, vx, vy, vz) {
+    const i = ptCursor; ptCursor = (ptCursor + 1) % MAX_PARTICLES;
+    ptPosArr[i*3]=x; ptPosArr[i*3+1]=y; ptPosArr[i*3+2]=z;
+    ptVel[i][0]=vx; ptVel[i][1]=vy; ptVel[i][2]=vz;
+    ptLife[i]=1.0;
+  }
+  function updateParticles(dt) {
+    for (let i = 0; i < MAX_PARTICLES; i++) {
+      if (ptLife[i] <= 0) { ptAlphaArr[i]=0; continue; }
+      ptLife[i] -= dt * 0.9;
+      ptVel[i][1] -= 2.6 * dt;
+      ptPosArr[i*3] += ptVel[i][0]*dt;
+      ptPosArr[i*3+1] += ptVel[i][1]*dt;
+      ptPosArr[i*3+2] += ptVel[i][2]*dt;
+      ptAlphaArr[i] = Math.max(ptLife[i], 0) * 0.85;
+      if (ptLife[i] <= 0) ptPosArr[i*3+1] = -100;
+    }
+  }
+
+  const keys = {};
+  let hintShown = true;
+  window.addEventListener('keydown', (e) => {
+    keys[e.key.toLowerCase()] = true;
+    if (hintShown && ['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(e.key.toLowerCase())) {
+      hintShown = false;
+      document.getElementById('driveHint').classList.add('hidden');
+    }
+  });
+  window.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
+  canvas.addEventListener('click', () => canvas.focus());
+
+  let boatX = 0, boatZ = 0, boatHeading = 0, boatSpeed = 0;
+  let boatY = 0, boatPitch = 0, boatRoll = 0, boatInit = false;
+  const MAX_FWD = 9, MAX_REV = -4, ACCEL = 7, DRAG = 3.2, TURN_RATE = 1.7;
+
+  function updateBoat(t, dt, intensity) {
+    let accelInput = 0;
+    if (keys['w'] || keys['arrowup']) accelInput = 1;
+    else if (keys['s'] || keys['arrowdown']) accelInput = -1;
+    if (accelInput > 0) boatSpeed += ACCEL * dt;
+    else if (accelInput < 0) boatSpeed -= ACCEL * dt;
+    else if (boatSpeed > 0) boatSpeed = Math.max(0, boatSpeed - DRAG * dt);
+    else boatSpeed = Math.min(0, boatSpeed + DRAG * dt);
+    boatSpeed = Math.max(MAX_REV, Math.min(MAX_FWD, boatSpeed));
+
+    let turnInput = 0;
+    if (keys['a'] || keys['arrowleft']) turnInput += 1;
+    if (keys['d'] || keys['arrowright']) turnInput -= 1;
+    const turnFactor = 0.35 + 0.65 * Math.min(Math.abs(boatSpeed) / MAX_FWD, 1);
+    boatHeading += turnInput * TURN_RATE * turnFactor * dt;
+
+    const fwdX = Math.cos(boatHeading), fwdZ = -Math.sin(boatHeading);
+    boatX += fwdX * boatSpeed * dt;
+    boatZ += fwdZ * boatSpeed * dt;
+
+    const rightX = Math.sin(boatHeading), rightZ = Math.cos(boatHeading);
+    const eps = 1.2;
+    const hC = waveHeightAt(boatX, boatZ, t, waves, intensity);
+    const hF = waveHeightAt(boatX + fwdX*eps, boatZ + fwdZ*eps, t, waves, intensity);
+    const hB = waveHeightAt(boatX - fwdX*eps, boatZ - fwdZ*eps, t, waves, intensity);
+    const hR = waveHeightAt(boatX + rightX*eps, boatZ + rightZ*eps, t, waves, intensity);
+    const hL = waveHeightAt(boatX - rightX*eps, boatZ - rightZ*eps, t, waves, intensity);
+
+    const targetY = hC + 0.04;
+    const slopeFwd = (hF - hB) / (2 * eps);
+    const targetPitch = slopeFwd * 1.35;
+    const slopeRight = (hR - hL) / (2 * eps);
+    const targetRoll = -slopeRight * 1.1;
+
+    if (!boatInit) { boatY = targetY; boatPitch = targetPitch; boatRoll = targetRoll; boatInit = true; }
+    const s = 1 - Math.exp(-dt * 3.2);
+    boatY += (targetY - boatY) * s;
+    boatPitch += (targetPitch - boatPitch) * s;
+    boatRoll += (targetRoll - boatRoll) * s;
+  }
+
+  let camIndex = 0;
+  let camEye = [0, 4.4, 12], camLook = [0, 0.6, -6], camFov = 50;
+  let camBoatY = 0; // heavily-damped version of boatY so the camera doesn't
+                     // whip down into occasional deep troughs from wave interference
+  function desiredRig(idx, bx, by, bz, heading) {
+    const fx = Math.cos(heading), fz = -Math.sin(heading);
+    const rx = Math.sin(heading), rz = Math.cos(heading);
+    if (idx === 0) return { eye: [bx - fx*11, by + 4.4, bz - fz*11], look: [bx + fx*6, by + 0.6, bz + fz*6], fov: 50 };
+    if (idx === 1) return { eye: [bx - fx*2 + rx*3.2, by + 1.6, bz - fz*2 + rz*3.2], look: [bx + fx*5, by + 0.3, bz + fz*5], fov: 42 };
+    if (idx === 2) return { eye: [bx + rx*9, by + 2.2, bz + rz*9], look: [bx, by + 0.3, bz], fov: 40 };
+    return { eye: [bx - fx*14, by + 11, bz - fz*14], look: [bx + fx*4, by + 0.2, bz + fz*4], fov: 55 };
+  }
+
+  let lastFlash = 0;
+  function flashOnce(strength) {
+    const el = document.getElementById('flash');
+    el.style.transition = 'opacity 80ms ease';
+    el.style.opacity = strength;
+    setTimeout(() => { el.style.transition = 'opacity 650ms ease'; el.style.opacity = 0; }, 80);
+  }
+  function maybeFlash(activatedUntil) {
+    const active = activatedUntil > performance.now();
+    const gap = active ? 850 : 6000 + Math.random()*5000;
+    if (performance.now() - lastFlash > gap) { lastFlash = performance.now(); flashOnce(active ? 0.3 : 0.09); }
+  }
+
+  let audioCtx;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+  function playBell() {
+    const ac = ensureAudio(); const now = ac.currentTime;
+    const dry = ac.createGain(); dry.gain.value = 0.85; dry.connect(ac.destination);
+    const wet = ac.createGain(); wet.gain.value = 0.55; wet.connect(ac.destination);
+    const bellBus = ac.createGain(); bellBus.connect(dry);
+    [0.05, 0.09, 0.14, 0.19, 0.26].forEach((d, idx) => {
+      const dl = ac.createDelay(1.0); dl.delayTime.value = d;
+      const fb = ac.createGain(); fb.gain.value = 0.3 - idx * 0.02;
+      const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2600 - idx * 350;
+      bellBus.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(wet);
+    });
+    const bufferSize = Math.floor(ac.sampleRate * 0.06);
+    const noiseBuffer = ac.createBuffer(1, bufferSize, ac.sampleRate);
+    const data = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+    const noise = ac.createBufferSource(); noise.buffer = noiseBuffer;
+    const noiseFilter = ac.createBiquadFilter();
+    noiseFilter.type = 'bandpass'; noiseFilter.frequency.value = 2600; noiseFilter.Q.value = 0.7;
+    const noiseGain = ac.createGain();
+    noiseGain.gain.setValueAtTime(0.6, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+    noise.connect(noiseFilter).connect(noiseGain).connect(bellBus);
+    noise.start(now);
+    const thump = ac.createOscillator(); const thumpGain = ac.createGain();
+    thump.type = 'sine';
+    thump.frequency.setValueAtTime(120, now);
+    thump.frequency.exponentialRampToValueAtTime(70, now + 0.08);
+    thumpGain.gain.setValueAtTime(0.7, now);
+    thumpGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    thump.connect(thumpGain).connect(bellBus);
+    thump.start(now); thump.stop(now + 0.15);
+    const nominal = 210;
+    const partials = [
+      { r: 0.5,   decay: 4.6, gain: 0.30 },
+      { r: 1.0,   decay: 4.2, gain: 0.55 },
+      { r: 1.004, decay: 4.2, gain: 0.40 },
+      { r: 1.19,  decay: 3.2, gain: 0.38 },
+      { r: 1.5,   decay: 2.6, gain: 0.32 },
+      { r: 2.0,   decay: 2.0, gain: 0.26 },
+      { r: 3.01,  decay: 1.2, gain: 0.16 },
+      { r: 4.02,  decay: 0.8, gain: 0.10 }
+    ];
+    partials.forEach(p => {
+      const osc = ac.createOscillator(); const gain = ac.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(nominal * p.r, now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(p.gain, now + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + p.decay);
+      osc.connect(gain).connect(bellBus);
+      osc.start(now); osc.stop(now + p.decay + 0.2);
+    });
+  }
+  function playHeartbeat(times) {
+    const ac = ensureAudio(); let t = ac.currentTime + 0.35;
+    for (let i=0;i<times;i++) {
+      [0,0.16].forEach((offset,j)=>{
+        const osc=ac.createOscillator(); const gain=ac.createGain();
+        osc.type='sine'; osc.frequency.setValueAtTime(j===0?60:50, t+offset);
+        gain.gain.setValueAtTime(0.0001, t+offset);
+        gain.gain.exponentialRampToValueAtTime(j===0?0.55:0.35, t+offset+0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t+offset+0.22);
+        osc.connect(gain).connect(ac.destination);
+        osc.start(t+offset); osc.stop(t+offset+0.25);
+      });
+      t += 0.85;
+    }
+  }
+
+  let W, H;
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    gl.viewport(0, 0, canvas.width, canvas.height);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  let sliderIntensity = parseFloat(document.getElementById('waveSlider').value);
+  document.getElementById('waveSlider').addEventListener('input', (e) => { sliderIntensity = parseFloat(e.target.value); });
+
+  let activateMul = 1, targetActivateMul = 1, activatedUntil = 0, shakeUntil = 0;
+  let elapsed = 0, lastTs = 0;
+  const lightDir = [-0.5, 0.75, -0.35];
+
+  function bindMesh(loc, mesh, hasNormal) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, mesh.posBuf);
+    gl.enableVertexAttribArray(loc.aPosition);
+    gl.vertexAttribPointer(loc.aPosition, 3, gl.FLOAT, false, 0, 0);
+    if (hasNormal) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, mesh.normBuf);
+      gl.enableVertexAttribArray(loc.aNormal);
+      gl.vertexAttribPointer(loc.aNormal, 3, gl.FLOAT, false, 0, 0);
+    }
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.idxBuf);
+  }
+
+  function frame(ts) {
+    const dt = Math.min(lastTs ? (ts - lastTs) / 1000 : 0.016, 0.05);
+    lastTs = ts; elapsed += dt;
+
+    activateMul += (targetActivateMul - activateMul) * 0.02;
+    if (activatedUntil && performance.now() > activatedUntil) { targetActivateMul = 1; activatedUntil = 0; }
+    const intensity = sliderIntensity * activateMul;
+
+    updateBoat(elapsed, dt, intensity);
+    camBoatY += (boatY - camBoatY) * (1 - Math.exp(-dt * 0.9));
+
+    const desired = desiredRig(camIndex, boatX, camBoatY, boatZ, boatHeading);
+    const camSmooth = 1 - Math.exp(-dt * 3.5);
+    camEye = camEye.map((v,i) => v + (desired.eye[i]-v)*camSmooth);
+    camLook = camLook.map((v,i) => v + (desired.look[i]-v)*camSmooth);
+    camFov += (desired.fov - camFov) * camSmooth;
+
+    let shakeX = 0, shakeY = 0;
+    if (performance.now() < shakeUntil) { shakeX = (Math.random()-0.5)*0.09; shakeY = (Math.random()-0.5)*0.09; }
+    const eye = [camEye[0]+shakeX, camEye[1]+shakeY, camEye[2]];
+    const view = m4LookAt(eye, camLook, [0,1,0]);
+    const projection = m4Perspective(camFov * Math.PI/180, W/H, 0.1, 600);
+
+    const cosH = Math.cos(boatHeading), sinH = Math.sin(boatHeading);
+    function rotateLocal(p) {
+      let x = p[0]*cosH + p[2]*sinH, z = -p[0]*sinH + p[2]*cosH;
+      const cosP = Math.cos(boatPitch), sinP = Math.sin(boatPitch);
+      const x2 = x*cosP - p[1]*sinP, y2 = x*sinP + p[1]*cosP;
+      return [x2 + boatX, y2 + boatY, z];
+    }
+    const bowW = rotateLocal([2.0*1.5, 0.35*1.5, 0]);
+    const sternW = rotateLocal([-2.0*1.5, -0.15*1.5, 0]);
+    const fwdWorldX = Math.cos(boatHeading), fwdWorldZ = -Math.sin(boatHeading);
+
+    const sprayRate = (intensity > 1.3 || Math.abs(boatSpeed) > 3) ? 6 : 1;
+    for (let i=0;i<sprayRate;i++) if (Math.random()<0.85) {
+      spawnParticle(bowW[0]+(Math.random()-0.5)*0.3, bowW[1], bowW[2]+(Math.random()-0.5)*0.3,
+        fwdWorldX*0.6+(Math.random()-0.5)*1.2, Math.random()*2.2+0.8, fwdWorldZ*0.6+(Math.random()-0.5)*0.6);
+    }
+    const wakeRate = intensity > 1.3 ? 3 : 1;
+    for (let i=0;i<wakeRate;i++) if (Math.random()<0.9) {
+      spawnParticle(sternW[0]+(Math.random()-0.5)*0.2, sternW[1]+0.02, sternW[2]+(Math.random()-0.5)*0.2,
+        -fwdWorldX*0.4+(Math.random()-0.5)*0.3, 0.15, -fwdWorldZ*0.4+(Math.random()-0.5)*1.4);
+    }
+    updateParticles(dt);
+    maybeFlash(activatedUntil);
+
+    gl.clearColor(0.02, 0.01, 0.06, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    gl.useProgram(oceanProg);
+    bindMesh(oceanLoc, oceanMesh, false);
+    gl.uniformMatrix4fv(oceanLoc.uProjection, false, projection);
+    gl.uniformMatrix4fv(oceanLoc.uView, false, view);
+    gl.uniformMatrix4fv(oceanLoc.uModel, false, m4Translation(boatX, 0, boatZ));
+    gl.uniform1f(oceanLoc.uTime, elapsed);
+    gl.uniform1f(oceanLoc.uIntensity, intensity);
+    gl.uniform2fv(oceanLoc.uWorldOffset, [boatX, boatZ]);
+    gl.uniform2fv(oceanLoc.uDir, dirFlat);
+    gl.uniform1fv(oceanLoc.uK, kFlat);
+    gl.uniform1fv(oceanLoc.uC, cFlat);
+    gl.uniform1fv(oceanLoc.uSteepness, steepFlat);
+    gl.uniform3fv(oceanLoc.uLightDir, lightDir);
+    gl.uniform3fv(oceanLoc.uDeepColor, [0.082,0.043,0.22]);
+    gl.uniform3fv(oceanLoc.uShallowColor, [0.416,0.247,0.839]);
+    gl.uniform2fv(oceanLoc.uWindDir, [Math.cos(WIND_ANGLE), Math.sin(WIND_ANGLE)]);
+    gl.uniform3fv(oceanLoc.uCameraPos, eye);
+    gl.drawElements(gl.TRIANGLES, oceanMesh.count, gl.UNSIGNED_SHORT, 0);
+
+    gl.useProgram(solidProg);
+    const boatModel = makeBoatModel([boatX, boatY, boatZ], boatHeading, boatPitch, boatRoll, 1.5);
+    gl.uniformMatrix4fv(solidLoc.uProjection, false, projection);
+    gl.uniformMatrix4fv(solidLoc.uView, false, view);
+    gl.uniform3fv(solidLoc.uLightDir, lightDir);
+    boatParts.forEach(part => {
+      bindMesh(solidLoc, part.mesh, true);
+      const local = m4Translation(part.pos[0], part.pos[1], part.pos[2]);
+      const world = m4Multiply(boatModel, local);
+      gl.uniformMatrix4fv(solidLoc.uModel, false, world);
+      gl.uniform3fv(solidLoc.uColor, part.color);
+      gl.uniform3fv(solidLoc.uEmissive, part.emissive);
+      gl.drawElements(gl.TRIANGLES, part.mesh.count, gl.UNSIGNED_SHORT, 0);
+    });
+
+    gl.useProgram(ptProg);
+    gl.bindBuffer(gl.ARRAY_BUFFER, ptPosBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, ptPosArr, gl.DYNAMIC_DRAW);
+    gl.enableVertexAttribArray(ptLoc.aPosition);
+    gl.vertexAttribPointer(ptLoc.aPosition, 3, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, ptAlphaBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, ptAlphaArr, gl.DYNAMIC_DRAW);
+    gl.enableVertexAttribArray(ptLoc.aAlpha);
+    gl.vertexAttribPointer(ptLoc.aAlpha, 1, gl.FLOAT, false, 0, 0);
+    gl.uniformMatrix4fv(ptLoc.uProjection, false, projection);
+    gl.uniformMatrix4fv(ptLoc.uView, false, view);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+    gl.depthMask(false);
+    gl.drawArrays(gl.POINTS, 0, MAX_PARTICLES);
+    gl.depthMask(true);
+    gl.disable(gl.BLEND);
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  const titleCard = document.getElementById('titleCard');
+  document.getElementById('activateBtn').addEventListener('click', () => {
+    targetActivateMul = 1.6;
+    activatedUntil = performance.now() + 6500;
+    shakeUntil = performance.now() + 900;
+    playBell();
+    playHeartbeat(6);
+    flashOnce(0.4);
+    titleCard.classList.remove('show'); void titleCard.offsetWidth; titleCard.classList.add('show');
+    const shockwave = document.getElementById('shockwave');
+    shockwave.classList.remove('go'); void shockwave.offsetWidth; shockwave.classList.add('go');
+    setTimeout(() => titleCard.classList.remove('show'), 4500);
+  });
+  document.getElementById('angleBtn').addEventListener('click', () => { camIndex = (camIndex + 1) % 4; });
+  document.getElementById('hideBtn').addEventListener('click', () => {
+    const ui = document.getElementById('ui'); const hb = document.getElementById('hideBtn');
+    const wp = document.getElementById('wavePanel');
+    const hidden = ui.classList.toggle('hidden');
+    wp.classList.toggle('hidden', hidden);
+    hb.textContent = hidden ? 'Show controls' : 'Hide controls';
+  });
+  document.getElementById('fsBtn').addEventListener('click', () => {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+    else document.exitFullscreen && document.exitFullscreen();
+  });
+})();
+</script>
+</body>
+</html>

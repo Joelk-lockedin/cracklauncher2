@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Loading game…</title>
+<style>
+  :root { color-scheme: dark; --bg: oklch(0.145 0.004 260); --muted: oklch(0.64 0.008 260); --line: oklch(0.28 0.004 260); --primary: oklch(0.9 0.2 124); }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--muted); font: 14px/1.4 Manrope, system-ui, sans-serif; letter-spacing: .04em; }
+  .boot { box-sizing: border-box; height: 100%; padding: 0 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center; }
+  .boot p { margin: 0; }
+  .spinner { width: 36px; height: 36px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--primary); animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .bar { width: min(280px, 80vw); height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+  .bar i { display: block; width: 0; height: 100%; background: var(--primary); transition: width .15s; }
+  small { min-height: 1.4em; font-size: 11px; opacity: .8; }
+  button { font: inherit; font-weight: 700; color: var(--bg); background: var(--primary); border: 0; border-radius: 6px; padding: 9px 18px; cursor: pointer; }
+  .error .spinner, .error .bar { display: none; }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+</style>
+</head>
+<body>
+<div class="boot" id="boot">
+  <span class="spinner"></span>
+  <p id="msg">Loading game…</p>
+  <div class="bar"><i id="fill"></i></div>
+  <small id="detail"></small>
+</div>
+<script>
+// Starts a game packed by the launcher's pack script: one gzip stream split into
+// /games/packed/<dir>/<i>.bin parts (each under Lovable's 10 MB limit). Parts
+// download in parallel and are kept in the Cache API, so a replay starts without
+// touching the network. Once inflated, the game replaces this page's document.
+(async () => {
+  const q = new URLSearchParams(location.search);
+  const dir = q.get('g') || '', parts = Number(q.get('n')), total = Number(q.get('b')) || 0;
+  const v = q.get('v') || '', title = q.get('t') || 'game';
+  const $ = id => document.getElementById(id);
+  const mb = n => (n / 1048576).toFixed(1);
+  document.title = `Loading ${title}…`;
+  $('msg').textContent = `Loading ${title}…`;
+  if (!/^[a-z0-9-]+$/.test(dir) || !(parts >= 1 && parts <= 64)) throw new Error('Unknown game.');
+  if (!('DecompressionStream' in window)) throw new Error('This browser is too old to run the game. Please update it.');
+
+  let cache = null;
+  try { cache = await caches.open('cl-games'); } catch {}
+  const base = `/games/packed/${dir}/`;
+  const loaded = new Array(parts).fill(0);
+  const show = () => {
+    if (!total) return;
+    const sum = loaded.reduce((a, b) => a + b, 0);
+    $('fill').style.width = `${Math.min(100, sum / total * 100)}%`;
+    $('detail').textContent = `${mb(sum)} / ${mb(total)} MB`;
+  };
+  const getPart = async (i, tries = 2) => {
+    const url = `${base}${i}.bin?v=${v}`;
+    const hit = cache && await cache.match(url).catch(() => null);
+    if (hit) { const blob = await hit.blob(); loaded[i] = blob.size; show(); return blob; }
+    try {
+      const res = await fetch(url);
+      if (!res.ok || !res.body) throw new Error(`Download failed (HTTP ${res.status}).`);
+      const reader = res.body.getReader(), chunks = [];
+      loaded[i] = 0;
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value); loaded[i] += value.length; show();
+      }
+      const blob = new Blob(chunks);
+      if (cache) cache.put(url, new Response(blob)).catch(() => {});
+      return blob;
+    } catch (err) {
+      if (tries > 1) return getPart(i, tries - 1);
+      throw err;
+    }
+  };
+  const blobs = await Promise.all(loaded.map((_, i) => getPart(i)));
+  $('msg').textContent = `Starting ${title}…`;
+
+  // Forget parts left over from older builds of this game.
+  if (cache) cache.keys().then(keys => keys.forEach(req => {
+    const u = new URL(req.url);
+    if (u.pathname.startsWith(base) && u.searchParams.get('v') !== v) cache.delete(req);
+  })).catch(() => {});
+
+  const packed = new Blob(blobs);
+  const magic = new Uint8Array(await packed.slice(0, 2).arrayBuffer());
+  // Some hosts gunzip on the way through; only inflate bytes that are still gzip.
+  const html = magic[0] === 0x1f && magic[1] === 0x8b
+    ? await new Response(packed.stream().pipeThrough(new DecompressionStream('gzip'))).blob()
+    : packed;
+  // Write the game over this page rather than navigating to a blob: URL. The page
+  // keeps its http(s) address, so games that resolve files relative to it (Ruffle,
+  // Unity loaders) still work, the same way the games pack's own viewer runs them.
+  const text = await html.text();
+  document.open();
+  document.write(text);
+  document.close();
+})().catch(err => {
+  const boot = document.getElementById('boot');
+  boot.classList.add('error');
+  document.getElementById('msg').textContent = "This game couldn't load.";
+  document.getElementById('detail').textContent = String((err && err.message) || err);
+  const retry = document.createElement('button');
+  retry.textContent = 'Try again';
+  retry.onclick = () => location.reload();
+  boot.append(retry);
+});
+</script>
+</body>
+</html>

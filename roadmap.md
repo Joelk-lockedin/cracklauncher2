@@ -1,0 +1,12 @@
+# Crack Launcher
+- [x] Inspect and integrate the six uploaded game versions.
+- [x] Capture real V1 and V2 game screenshots for covers.
+- [x] Build the launcher with hover Play and version selection.
+- [x] Verify playing games, version selection, and mobile layout.
+- [x] Add "Other games" section in the sidebar with placeholder slots for future titles.
+- [x] Route all CDN-hosted games through the playable-page proxy (fixes Wrestle Bros download bug).
+- [x] Add a loading boot screen to the game player.
+- [x] Add ~110 popular games from the HTML-Games pack to Other games, grouped into series with versions.
+- [x] Pack games into gzip parts under 8 MB and launch them through public/play.html (parallel download, cached for instant replays).
+- [x] Test every packed game in headless Chrome and use real screenshots as WebP covers.
+- [x] Speed up the library: WebP covers, lazy-loaded card art, font preconnect, search across versions.

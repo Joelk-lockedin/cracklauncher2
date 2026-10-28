@@ -1,0 +1,884 @@
+{
+ "1.12.html": {
+  "dir": "1-12",
+  "parts": 3,
+  "bytes": 17840540,
+  "size": 33734289,
+  "v": "56d781549a"
+ },
+ "1.8.html": {
+  "dir": "1-8",
+  "parts": 2,
+  "bytes": 14263304,
+  "size": 18459213,
+  "v": "eb3c8cbcde"
+ },
+ "1v1.lol.html": {
+  "dir": "1v1-lol",
+  "parts": 4,
+  "bytes": 29794648,
+  "size": 38600173,
+  "v": "93d79b446e"
+ },
+ "2048.html": {
+  "dir": "2048",
+  "parts": 1,
+  "bytes": 9543,
+  "size": 46342,
+  "v": "3e43f58ebf"
+ },
+ "8ballclassic.html": {
+  "dir": "8ballclassic",
+  "parts": 1,
+  "bytes": 6732424,
+  "size": 8815098,
+  "v": "d80209bf94"
+ },
+ "amongus.html": {
+  "dir": "amongus",
+  "parts": 1,
+  "bytes": 5883963,
+  "size": 7870674,
+  "v": "10c785f5d3"
+ },
+ "angrybirds.html": {
+  "dir": "angrybirds",
+  "parts": 2,
+  "bytes": 10858667,
+  "size": 14147188,
+  "v": "d2d5b66387"
+ },
+ "badicecream.html": {
+  "dir": "badicecream",
+  "parts": 1,
+  "bytes": 6815635,
+  "size": 9217334,
+  "v": "5dc7a3346f"
+ },
+ "badicecream2.html": {
+  "dir": "badicecream2",
+  "parts": 1,
+  "bytes": 3266622,
+  "size": 4313677,
+  "v": "7b2de58cef"
+ },
+ "badicecream3.html": {
+  "dir": "badicecream3",
+  "parts": 1,
+  "bytes": 3850553,
+  "size": 5069609,
+  "v": "b8f28d5078"
+ },
+ "baldisbasics.html": {
+  "dir": "baldisbasics",
+  "parts": 5,
+  "bytes": 38340651,
+  "size": 49694490,
+  "v": "18d93ed921"
+ },
+ "basketballstars.html": {
+  "dir": "basketballstars",
+  "parts": 2,
+  "bytes": 9072817,
+  "size": 11793563,
+  "v": "2fe937a12e"
+ },
+ "basketbros.html": {
+  "dir": "basketbros",
+  "parts": 1,
+  "bytes": 5680135,
+  "size": 10892562,
+  "v": "05dc687d40"
+ },
+ "basketrandom.html": {
+  "dir": "basketrandom",
+  "parts": 1,
+  "bytes": 2037468,
+  "size": 5055174,
+  "v": "6408f98a3e"
+ },
+ "bitlife.html": {
+  "dir": "bitlife",
+  "parts": 3,
+  "bytes": 20707733,
+  "size": 27216225,
+  "v": "e2bb156efe"
+ },
+ "bloonsTD3.html": {
+  "dir": "bloonstd3",
+  "parts": 1,
+  "bytes": 6431526,
+  "size": 8665053,
+  "v": "0e8e35e644"
+ },
+ "bloonsTD4.html": {
+  "dir": "bloonstd4",
+  "parts": 1,
+  "bytes": 8315634,
+  "size": 11144029,
+  "v": "34150a9dd3"
+ },
+ "bloonsTD5.html": {
+  "dir": "bloonstd5",
+  "parts": 2,
+  "bytes": 16465752,
+  "size": 21674453,
+  "v": "587640c91e"
+ },
+ "bowmasters.html": {
+  "dir": "bowmasters",
+  "parts": 3,
+  "bytes": 22580994,
+  "size": 27568357,
+  "v": "30ad58a1ee"
+ },
+ "boxingrandom.htm": {
+  "dir": "boxingrandom",
+  "parts": 1,
+  "bytes": 1450178,
+  "size": 4675009,
+  "v": "61a9e34563"
+ },
+ "bubbleshooter.html": {
+  "dir": "bubbleshooter",
+  "parts": 1,
+  "bytes": 5120917,
+  "size": 7076246,
+  "v": "381f75ecd3"
+ },
+ "candycrush.html": {
+  "dir": "candycrush",
+  "parts": 1,
+  "bytes": 2832768,
+  "size": 4528176,
+  "v": "1fa31a516b"
+ },
+ "capybaraclicker.html": {
+  "dir": "capybaraclicker",
+  "parts": 2,
+  "bytes": 10337353,
+  "size": 13528719,
+  "v": "48715ae8a7"
+ },
+ "chess.html": {
+  "dir": "chess",
+  "parts": 1,
+  "bytes": 5047339,
+  "size": 6914845,
+  "v": "b8cd3a11b5"
+ },
+ "cookieclicker.htm": {
+  "dir": "cookieclicker",
+  "parts": 1,
+  "bytes": 4718095,
+  "size": 7648852,
+  "v": "e450cd3b16"
+ },
+ "crazycattle3D.html": {
+  "dir": "crazycattle3d",
+  "parts": 6,
+  "bytes": 43042055,
+  "size": 52035023,
+  "v": "054d2dbfcc"
+ },
+ "crossyroad.htm": {
+  "dir": "crossyroad",
+  "parts": 1,
+  "bytes": 2433877,
+  "size": 3250987,
+  "v": "72c7f7fd5a"
+ },
+ "cuttherope.html": {
+  "dir": "cuttherope",
+  "parts": 3,
+  "bytes": 22697213,
+  "size": 29922924,
+  "v": "58d492d1fd"
+ },
+ "doodlejump.html": {
+  "dir": "doodlejump",
+  "parts": 1,
+  "bytes": 276353,
+  "size": 422608,
+  "v": "dc37b407b6"
+ },
+ "driftboss.htm": {
+  "dir": "driftboss",
+  "parts": 1,
+  "bytes": 2887920,
+  "size": 8989853,
+  "v": "4e6b6a4b28"
+ },
+ "drivemad.htm": {
+  "dir": "drivemad",
+  "parts": 1,
+  "bytes": 2484226,
+  "size": 4999037,
+  "v": "228e0f5ae0"
+ },
+ "ducklife.html": {
+  "dir": "ducklife",
+  "parts": 1,
+  "bytes": 6323546,
+  "size": 8514800,
+  "v": "f5400afff5"
+ },
+ "ducklife2.html": {
+  "dir": "ducklife2",
+  "parts": 1,
+  "bytes": 6962283,
+  "size": 9340008,
+  "v": "d938c5b3f6"
+ },
+ "ducklife3.html": {
+  "dir": "ducklife3",
+  "parts": 2,
+  "bytes": 11228264,
+  "size": 14855224,
+  "v": "afaa5527cb"
+ },
+ "ducklife4.html": {
+  "dir": "ducklife4",
+  "parts": 2,
+  "bytes": 14146225,
+  "size": 18635132,
+  "v": "8da1b95270"
+ },
+ "earntodie.html": {
+  "dir": "earntodie",
+  "parts": 2,
+  "bytes": 9045046,
+  "size": 12081965,
+  "v": "e579b1537c"
+ },
+ "earntodie2.html": {
+  "dir": "earntodie2",
+  "parts": 2,
+  "bytes": 12670473,
+  "size": 16772153,
+  "v": "728ed2fdb6"
+ },
+ "eggycar.html": {
+  "dir": "eggycar",
+  "parts": 1,
+  "bytes": 4836867,
+  "size": 6784286,
+  "v": "f4735294ee"
+ },
+ "escaperoad.html": {
+  "dir": "escaperoad",
+  "parts": 4,
+  "bytes": 28240873,
+  "size": 37332659,
+  "v": "c2178e4b89"
+ },
+ "fireboyandwatergirl.html": {
+  "dir": "fireboyandwatergirl",
+  "parts": 1,
+  "bytes": 6903867,
+  "size": 9279226,
+  "v": "ea18e70759"
+ },
+ "fireboyandwatergirl2.html": {
+  "dir": "fireboyandwatergirl2",
+  "parts": 1,
+  "bytes": 7442481,
+  "size": 9720912,
+  "v": "d152e94ded"
+ },
+ "fireboyandwatergirl3.html": {
+  "dir": "fireboyandwatergirl3",
+  "parts": 1,
+  "bytes": 7225295,
+  "size": 9490651,
+  "v": "c322b951e3"
+ },
+ "fireboyandwatergirl4.html": {
+  "dir": "fireboyandwatergirl4",
+  "parts": 1,
+  "bytes": 7051673,
+  "size": 9214888,
+  "v": "38f490b0d1"
+ },
+ "flappybird.html": {
+  "dir": "flappybird",
+  "parts": 1,
+  "bytes": 1198469,
+  "size": 4341092,
+  "v": "0d16bc276d"
+ },
+ "fnaf.html": {
+  "dir": "fnaf",
+  "parts": 2,
+  "bytes": 16205846,
+  "size": 19627678,
+  "v": "17429f74c6"
+ },
+ "fnaf2.html": {
+  "dir": "fnaf2",
+  "parts": 3,
+  "bytes": 21777423,
+  "size": 26368271,
+  "v": "9a260a443b"
+ },
+ "footballbros.html": {
+  "dir": "footballbros",
+  "parts": 2,
+  "bytes": 10898961,
+  "size": 17513036,
+  "v": "513f9f5cdc"
+ },
+ "fruitninja.html": {
+  "dir": "fruitninja",
+  "parts": 1,
+  "bytes": 6445569,
+  "size": 8404819,
+  "v": "5b11522933"
+ },
+ "geometrydash.html": {
+  "dir": "geometrydash",
+  "parts": 1,
+  "bytes": 7700974,
+  "size": 13389848,
+  "v": "dc2d767401"
+ },
+ "getawayshootout.htm": {
+  "dir": "getawayshootout",
+  "parts": 3,
+  "bytes": 17185946,
+  "size": 24224551,
+  "v": "d484b9033f"
+ },
+ "googledino.html": {
+  "dir": "googledino",
+  "parts": 1,
+  "bytes": 43099,
+  "size": 115940,
+  "v": "fcfb41203b"
+ },
+ "happywheels.html": {
+  "dir": "happywheels",
+  "parts": 2,
+  "bytes": 9544574,
+  "size": 12677623,
+  "v": "9508b1b75b"
+ },
+ "helixjump.html": {
+  "dir": "helixjump",
+  "parts": 1,
+  "bytes": 8042416,
+  "size": 10506701,
+  "v": "cd5a686bc3"
+ },
+ "hillclimbracinglite.html": {
+  "dir": "hillclimbracinglite",
+  "parts": 1,
+  "bytes": 6683695,
+  "size": 8742889,
+  "v": "eb56660f3f"
+ },
+ "houseofhazards.html": {
+  "dir": "houseofhazards",
+  "parts": 2,
+  "bytes": 13348014,
+  "size": 17371118,
+  "v": "783f5acc47"
+ },
+ "idlebreakout.html": {
+  "dir": "idlebreakout",
+  "parts": 1,
+  "bytes": 1012085,
+  "size": 2052721,
+  "v": "6a3e0f7b33"
+ },
+ "jetpackjoyride.html": {
+  "dir": "jetpackjoyride",
+  "parts": 2,
+  "bytes": 15569160,
+  "size": 21990169,
+  "v": "98b895673c"
+ },
+ "learntofly.html": {
+  "dir": "learntofly",
+  "parts": 1,
+  "bytes": 5920491,
+  "size": 7994335,
+  "v": "d7d52ff7b4"
+ },
+ "learntofly2.html": {
+  "dir": "learntofly2",
+  "parts": 2,
+  "bytes": 10592426,
+  "size": 14044831,
+  "v": "2ece3d6254"
+ },
+ "learntofly3.html": {
+  "dir": "learntofly3",
+  "parts": 3,
+  "bytes": 23002286,
+  "size": 30094951,
+  "v": "163d8198cb"
+ },
+ "leveldevil.html": {
+  "dir": "leveldevil",
+  "parts": 1,
+  "bytes": 1926473,
+  "size": 6800668,
+  "v": "271b9b556d"
+ },
+ "melonplayground.html": {
+  "dir": "melonplayground",
+  "parts": 2,
+  "bytes": 16643892,
+  "size": 21586797,
+  "v": "ff31932912"
+ },
+ "minesweeper.html": {
+  "dir": "minesweeper",
+  "parts": 1,
+  "bytes": 552437,
+  "size": 1230108,
+  "v": "1e36080617"
+ },
+ "monkeymart.htm": {
+  "dir": "monkeymart",
+  "parts": 2,
+  "bytes": 9253654,
+  "size": 14041634,
+  "v": "1bf57b1038"
+ },
+ "motox3m.htm": {
+  "dir": "motox3m",
+  "parts": 1,
+  "bytes": 6252438,
+  "size": 11675580,
+  "v": "f4a823b83d"
+ },
+ "motox3m2.html": {
+  "dir": "motox3m2",
+  "parts": 1,
+  "bytes": 4462438,
+  "size": 9837708,
+  "v": "514aff2da9"
+ },
+ "motox3m3.html": {
+  "dir": "motox3m3",
+  "parts": 1,
+  "bytes": 5257248,
+  "size": 10593685,
+  "v": "960484ce82"
+ },
+ "motox3mpoolparty.html": {
+  "dir": "motox3mpoolparty",
+  "parts": 1,
+  "bytes": 3885896,
+  "size": 5105520,
+  "v": "4263887ff0"
+ },
+ "motox3mspookyland.html": {
+  "dir": "motox3mspookyland",
+  "parts": 1,
+  "bytes": 4536008,
+  "size": 5945904,
+  "v": "ee753b6da9"
+ },
+ "motox3mwinter.html": {
+  "dir": "motox3mwinter",
+  "parts": 1,
+  "bytes": 6118609,
+  "size": 7994311,
+  "v": "3f0e9b3805"
+ },
+ "ovo.html": {
+  "dir": "ovo",
+  "parts": 1,
+  "bytes": 2332501,
+  "size": 7269406,
+  "v": "a089117a9f"
+ },
+ "ovo2.html": {
+  "dir": "ovo2",
+  "parts": 1,
+  "bytes": 661655,
+  "size": 2410032,
+  "v": "4eb81bd2ae"
+ },
+ "pacman.html": {
+  "dir": "pacman",
+  "parts": 1,
+  "bytes": 1790586,
+  "size": 3364269,
+  "v": "386abeba8f"
+ },
+ "papasburgeria.html": {
+  "dir": "papasburgeria",
+  "parts": 2,
+  "bytes": 8952110,
+  "size": 11966742,
+  "v": "57ae5b533d"
+ },
+ "papascupcakeria.html": {
+  "dir": "papascupcakeria",
+  "parts": 2,
+  "bytes": 14214005,
+  "size": 18768481,
+  "v": "1a441c0b43"
+ },
+ "papasfreezeria.html": {
+  "dir": "papasfreezeria",
+  "parts": 2,
+  "bytes": 10954716,
+  "size": 14503865,
+  "v": "28302d154e"
+ },
+ "papaspizzeria.html": {
+  "dir": "papaspizzeria",
+  "parts": 1,
+  "bytes": 7931349,
+  "size": 10594161,
+  "v": "c32198bd80"
+ },
+ "papastacomia.html": {
+  "dir": "papastacomia",
+  "parts": 2,
+  "bytes": 10556286,
+  "size": 13996893,
+  "v": "eb1b865257"
+ },
+ "paperio2.htm": {
+  "dir": "paperio2",
+  "parts": 1,
+  "bytes": 275408,
+  "size": 648963,
+  "v": "f2fa14a0de"
+ },
+ "plantsvszombies.html": {
+  "dir": "plantsvszombies",
+  "parts": 2,
+  "bytes": 15965778,
+  "size": 21035113,
+  "v": "1e7fad9771"
+ },
+ "polytrack.html": {
+  "dir": "polytrack",
+  "parts": 1,
+  "bytes": 5464839,
+  "size": 7174330,
+  "v": "7e0a349972"
+ },
+ "ragdollhit.html": {
+  "dir": "ragdollhit",
+  "parts": 2,
+  "bytes": 15014886,
+  "size": 19654523,
+  "v": "2f56113197"
+ },
+ "retrobowl.html": {
+  "dir": "retrobowl",
+  "parts": 1,
+  "bytes": 5562579,
+  "size": 7253470,
+  "v": "df062ac417"
+ },
+ "retrobowlcollege.html": {
+  "dir": "retrobowlcollege",
+  "parts": 1,
+  "bytes": 6173773,
+  "size": 8215975,
+  "v": "3c23d17f3c"
+ },
+ "riddleschool.html": {
+  "dir": "riddleschool",
+  "parts": 1,
+  "bytes": 5648469,
+  "size": 7641687,
+  "v": "d7be926f86"
+ },
+ "riddleschool2.html": {
+  "dir": "riddleschool2",
+  "parts": 1,
+  "bytes": 6543462,
+  "size": 8799087,
+  "v": "017ee5a3ce"
+ },
+ "riddleschool3.html": {
+  "dir": "riddleschool3",
+  "parts": 2,
+  "bytes": 12938294,
+  "size": 17073847,
+  "v": "f36e826d92"
+ },
+ "rooftopsnipers.htm": {
+  "dir": "rooftopsnipers",
+  "parts": 2,
+  "bytes": 10674821,
+  "size": 15178876,
+  "v": "3b6c499810"
+ },
+ "rooftopsnipers2.html": {
+  "dir": "rooftopsnipers2",
+  "parts": 2,
+  "bytes": 10381189,
+  "size": 13579108,
+  "v": "3711fed780"
+ },
+ "run.html": {
+  "dir": "run",
+  "parts": 1,
+  "bytes": 6579809,
+  "size": 8895652,
+  "v": "2577075d1f"
+ },
+ "run2.html": {
+  "dir": "run2",
+  "parts": 1,
+  "bytes": 5962786,
+  "size": 8097620,
+  "v": "9074251231"
+ },
+ "run3.html": {
+  "dir": "run3",
+  "parts": 2,
+  "bytes": 13176325,
+  "size": 22339104,
+  "v": "3925c3acb1"
+ },
+ "slope.html": {
+  "dir": "slope",
+  "parts": 2,
+  "bytes": 11455186,
+  "size": 25985716,
+  "v": "3ee7daf841"
+ },
+ "slope2player.html": {
+  "dir": "slope2player",
+  "parts": 1,
+  "bytes": 7896061,
+  "size": 10274649,
+  "v": "f364ddb1fe"
+ },
+ "sm64.html": {
+  "dir": "sm64",
+  "parts": 1,
+  "bytes": 6322981,
+  "size": 8376747,
+  "v": "77cd5adf5d"
+ },
+ "snowrider.htm": {
+  "dir": "snowrider",
+  "parts": 2,
+  "bytes": 15162869,
+  "size": 19841418,
+  "v": "57a6f18e8d"
+ },
+ "soccerbros.html": {
+  "dir": "soccerbros",
+  "parts": 1,
+  "bytes": 7528160,
+  "size": 13094977,
+  "v": "5d7b2e865f"
+ },
+ "soccerrandom.htm": {
+  "dir": "soccerrandom",
+  "parts": 1,
+  "bytes": 1083649,
+  "size": 2675207,
+  "v": "e2505c6c2a"
+ },
+ "sprunki.html": {
+  "dir": "sprunki",
+  "parts": 2,
+  "bytes": 13083804,
+  "size": 18156899,
+  "v": "302212dd45"
+ },
+ "stack.html": {
+  "dir": "stack",
+  "parts": 1,
+  "bytes": 168749,
+  "size": 628576,
+  "v": "e4ba851a2d"
+ },
+ "stickmanhook.html": {
+  "dir": "stickmanhook",
+  "parts": 1,
+  "bytes": 2587058,
+  "size": 4602862,
+  "v": "720bec04a2"
+ },
+ "subwaysurfershavana.html": {
+  "dir": "subwaysurfershavana",
+  "parts": 4,
+  "bytes": 27160691,
+  "size": 35386314,
+  "v": "ca4eb3f3f7"
+ },
+ "subwaysurferssanfrancisco.html": {
+  "dir": "subwaysurferssanfrancisco",
+  "parts": 4,
+  "bytes": 27111496,
+  "size": 35307036,
+  "v": "eb58d9d5c5"
+ },
+ "superhot.html": {
+  "dir": "superhot",
+  "parts": 3,
+  "bytes": 21903701,
+  "size": 26512163,
+  "v": "58ddd22082"
+ },
+ "templerun2.htm": {
+  "dir": "templerun2",
+  "parts": 2,
+  "bytes": 11047737,
+  "size": 18769641,
+  "v": "05931d0d8b"
+ },
+ "territorialio.html": {
+  "dir": "territorialio",
+  "parts": 1,
+  "bytes": 254533,
+  "size": 1407570,
+  "v": "3b55d9743b"
+ },
+ "tinyfishing.html": {
+  "dir": "tinyfishing",
+  "parts": 1,
+  "bytes": 1842730,
+  "size": 2451912,
+  "v": "9df0a544a5"
+ },
+ "tombofthemask.htm": {
+  "dir": "tombofthemask",
+  "parts": 3,
+  "bytes": 19509992,
+  "size": 28058221,
+  "v": "04097ea32a"
+ },
+ "tunnelrush.html": {
+  "dir": "tunnelrush",
+  "parts": 2,
+  "bytes": 12534898,
+  "size": 17360488,
+  "v": "2a375cc462"
+ },
+ "unicyclehero.html": {
+  "dir": "unicyclehero",
+  "parts": 1,
+  "bytes": 1938475,
+  "size": 2573448,
+  "v": "117a03af3c"
+ },
+ "vex4.html": {
+  "dir": "vex4",
+  "parts": 2,
+  "bytes": 10375811,
+  "size": 13885419,
+  "v": "5e89a43990"
+ },
+ "vex5.html": {
+  "dir": "vex5",
+  "parts": 2,
+  "bytes": 12017568,
+  "size": 15661199,
+  "v": "5365d88323"
+ },
+ "vex6.htm": {
+  "dir": "vex6",
+  "parts": 1,
+  "bytes": 7720963,
+  "size": 10042324,
+  "v": "21d1f68bcf"
+ },
+ "vex7.htm": {
+  "dir": "vex7",
+  "parts": 2,
+  "bytes": 11085420,
+  "size": 14780477,
+  "v": "a9d579063e"
+ },
+ "vex8.htm": {
+  "dir": "vex8",
+  "parts": 2,
+  "bytes": 12595637,
+  "size": 16785655,
+  "v": "6b4af11318"
+ },
+ "vexx3m.html": {
+  "dir": "vexx3m",
+  "parts": 1,
+  "bytes": 7878591,
+  "size": 10255000,
+  "v": "7411f4f46f"
+ },
+ "vexx3m2.html": {
+  "dir": "vexx3m2",
+  "parts": 2,
+  "bytes": 9525778,
+  "size": 12721259,
+  "v": "f07a4056b2"
+ },
+ "volleyrandom.html": {
+  "dir": "volleyrandom",
+  "parts": 1,
+  "bytes": 1613044,
+  "size": 3853392,
+  "v": "469e05316c"
+ },
+ "webecomewhatwebehold.html": {
+  "dir": "webecomewhatwebehold",
+  "parts": 1,
+  "bytes": 6047107,
+  "size": 8045029,
+  "v": "ae448cf3c4"
+ },
+ "wheeliebike.html": {
+  "dir": "wheeliebike",
+  "parts": 1,
+  "bytes": 1596104,
+  "size": 2135099,
+  "v": "79ce6d74d4"
+ },
+ "wordleunlimited.html": {
+  "dir": "wordleunlimited",
+  "parts": 1,
+  "bytes": 61362,
+  "size": 184510,
+  "v": "c54249fbb1"
+ },
+ "worldshardestgame.html": {
+  "dir": "worldshardestgame",
+  "parts": 1,
+  "bytes": 5768770,
+  "size": 7796770,
+  "v": "21dcb11391"
+ },
+ "worldshardestgame2.html": {
+  "dir": "worldshardestgame2",
+  "parts": 1,
+  "bytes": 7447229,
+  "size": 9974414,
+  "v": "334eb1f3c7"
+ },
+ "worldshardestgame3.html": {
+  "dir": "worldshardestgame3",
+  "parts": 1,
+  "bytes": 6643379,
+  "size": 8672453,
+  "v": "15e9bf4332"
+ },
+ "wrestlebros.html": {
+  "dir": "wrestlebros",
+  "parts": 1,
+  "bytes": 7219318,
+  "size": 12364650,
+  "v": "5c564cd441"
+ },
+ "zombierush.html": {
+  "dir": "zombierush",
+  "parts": 1,
+  "bytes": 2102046,
+  "size": 2826740,
+  "v": "8c9598a172"
+ }
+}
